@@ -77,14 +77,15 @@ func initCheck() error {
 }
 
 func (s *IPSet) createHashSet(name string) error {
-	out, err := exec.Command("/usr/bin/sudo",
+/*	out, err := exec.Command("/usr/bin/sudo",
 		ipsetPath, "create", name, s.HashType, "family", s.HashFamily, "hashsize", strconv.Itoa(s.HashSize),
+		"maxelem", strconv.Itoa(s.MaxElem), "timeout", strconv.Itoa(s.Timeout), "-exist").CombinedOutput()*/
+	out, err := exec.Command(ipsetPath, "create", name, s.HashType, "family", s.HashFamily, "hashsize", strconv.Itoa(s.HashSize),
 		"maxelem", strconv.Itoa(s.MaxElem), "timeout", strconv.Itoa(s.Timeout), "-exist").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error creating ipset %s with type %s: %v (%s)", name, s.HashType, err, out)
 	}
-	out, err = exec.Command("/usr/bin/sudo",
-		ipsetPath, "flush", name).CombinedOutput()
+	out, err = exec.Command(ipsetPath, "flush", name).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error flushing ipset %s: %v (%s)", name, err, out)
 	}
@@ -134,7 +135,7 @@ func (s *IPSet) Refresh(entries []string) error {
 		return err
 	}
 	for _, entry := range entries {
-		out, err := exec.Command("/usr/bin/sudo", ipsetPath, "add", tempName, entry, "-exist").CombinedOutput()
+		out, err := exec.Command(ipsetPath, "add", tempName, entry, "-exist").CombinedOutput()
 		if err != nil {
 			log.Errorf("error adding entry %s to set %s: %v (%s)", entry, tempName, err, out)
 		}
@@ -152,7 +153,7 @@ func (s *IPSet) Refresh(entries []string) error {
 
 // Test is used to check whether the specified entry is in the set or not.
 func (s *IPSet) Test(entry string) (bool, error) {
-	out, err := exec.Command("/usr/bin/sudo", ipsetPath, "test", s.Name, entry).CombinedOutput()
+	out, err := exec.Command(ipsetPath, "test", s.Name, entry).CombinedOutput()
 	if err == nil {
 		reg, e := regexp.Compile("NOT")
 		if e == nil && reg.MatchString(string(out)) {
@@ -170,7 +171,7 @@ func (s *IPSet) Test(entry string) (bool, error) {
 // Add is used to add the specified entry to the set.
 // A timeout of 0 means that the entry will be stored permanently in the set.
 func (s *IPSet) Add(entry string, timeout int) error {
-	out, err := exec.Command("/usr/bin/sudo", ipsetPath, "add", s.Name, entry, "timeout", strconv.Itoa(timeout), "-exist").CombinedOutput()
+	out, err := exec.Command(ipsetPath, "add", s.Name, entry, "timeout", strconv.Itoa(timeout), "-exist").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error adding entry %s: %v (%s)", entry, err, out)
 	}
@@ -179,7 +180,7 @@ func (s *IPSet) Add(entry string, timeout int) error {
 
 // Del is used to delete the specified entry from the set.
 func (s *IPSet) Del(entry string) error {
-	out, err := exec.Command("/usr/bin/sudo", ipsetPath, "del", s.Name, entry, "-exist").CombinedOutput()
+	out, err := exec.Command(ipsetPath, "del", s.Name, entry, "-exist").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error deleting entry %s: %v (%s)", entry, err, out)
 	}
@@ -188,7 +189,7 @@ func (s *IPSet) Del(entry string) error {
 
 // Flush is used to flush all entries in the set.
 func (s *IPSet) Flush() error {
-	out, err := exec.Command("/usr/bin/sudo", ipsetPath, "flush", s.Name).CombinedOutput()
+	out, err := exec.Command(ipsetPath, "flush", s.Name).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error flushing set %s: %v (%s)", s.Name, err, out)
 	}
@@ -197,7 +198,7 @@ func (s *IPSet) Flush() error {
 
 // Destroy is used to destroy the set.
 func (s *IPSet) Destroy() error {
-	out, err := exec.Command("/usr/bin/sudo", ipsetPath, "destroy", s.Name).CombinedOutput()
+	out, err := exec.Command(ipsetPath, "destroy", s.Name).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error destroying set %s: %v (%s)", s.Name, err, out)
 	}
@@ -206,8 +207,7 @@ func (s *IPSet) Destroy() error {
 
 // Swap is used to hot swap two sets on-the-fly. Use with names of existing sets of the same type.
 func Swap(from, to string) error {
-	out, err := exec.Command("/usr/bin/sudo",
-		ipsetPath, "swap", from, to).Output()
+	out, err := exec.Command(ipsetPath, "swap", from, to).Output()
 	if err != nil {
 		return fmt.Errorf("error swapping ipset %s to %s: %v (%s)", from, to, err, out)
 	}
@@ -215,8 +215,7 @@ func Swap(from, to string) error {
 }
 
 func destroyIPSet(name string) error {
-	out, err := exec.Command("/usr/bin/sudo",
-		ipsetPath, "destroy", name).Output()
+	out, err := exec.Command(ipsetPath, "destroy", name).Output()
 	if err != nil {
 		return fmt.Errorf("error destroying ipset %s: %v (%s)", name, err, out)
 	}
