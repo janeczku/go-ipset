@@ -118,12 +118,12 @@ func New(name string, hashtype string, p *Params) (*IPSet, error) {
 		return nil, err
 	}
 
-	s := &IPSet{name, hashtype, p.HashFamily, p.HashSize, p.MaxElem, p.Timeout}
+	s := IPSet{name, hashtype, p.HashFamily, p.HashSize, p.MaxElem, p.Timeout}
 	err := s.createHashSet(name)
 	if err != nil {
 		return nil, err
 	}
-	return s, nil
+	return &s, nil
 }
 
 // Refresh is used to to overwrite the set with the specified entries.
