@@ -1,7 +1,7 @@
 # go-ipset #
 
 This library is a simple GoLang wrapper to the IPtables ipset userspace utility.
-It provides an interface to allow Go programs to easily manipulate ipsets. 
+It provides an interface to allow Go programs to easily manipulate ipsets.
 It is currently limited to sets of `type hash`.
 
 For ipset command documentation: http://ipset.netfilter.org/ipset.man.html
@@ -21,7 +21,7 @@ Install dependencies:
 
 ## API Reference ##
 
-[![GoDoc](https://godoc.org/github.com/google/go-github/github?status.svg)](https://godoc.org/github.com/janeczku/go-ipset/ipset) 
+[![GoDoc](https://godoc.org/github.com/google/go-github/github?status.svg)](https://godoc.org/github.com/janeczku/go-ipset/ipset)
 
 ## Usage ##
 
@@ -81,4 +81,10 @@ For example, to create a set whose entries will expire after 60 seconds, lets sa
 
 ```go
 abusers := ipset.New("ratelimited", "hash:ip", &ipset.Params{Timeout: 60})
+```
+
+#### List entries of a set
+```go
+// list is []string
+list ipset.List("customers")
 ```

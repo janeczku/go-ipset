@@ -77,7 +77,7 @@ func initCheck() error {
 }
 
 func (s *IPSet) createHashSet(name string) error {
-/*	out, err := exec.Command("/usr/bin/sudo",
+	/*	out, err := exec.Command("/usr/bin/sudo",
 		ipsetPath, "create", name, s.HashType, "family", s.HashFamily, "hashsize", strconv.Itoa(s.HashSize),
 		"maxelem", strconv.Itoa(s.MaxElem), "timeout", strconv.Itoa(s.Timeout), "-exist").CombinedOutput()*/
 	out, err := exec.Command(ipsetPath, "create", name, s.HashType, "family", s.HashFamily, "hashsize", strconv.Itoa(s.HashSize),
@@ -203,6 +203,17 @@ func (s *IPSet) Destroy() error {
 		return fmt.Errorf("error destroying set %s: %v (%s)", s.Name, err, out)
 	}
 	return nil
+}
+
+// List is used to show the contents of a set
+func (s *IPSet) List() ([]string, error) {
+	out, err := exec.Command(ipsetPath, "list", s.Name).CombinedOutput()
+	if err != nil {
+		return []string{}, fmt.Errorf("error listing set %s: %v (%s)", s.Name, err, out)
+	}
+	r := regexp.MustCompile("(?m)^(.*\n)*Members:\n")
+	list := r.ReplaceAllString(string(out[:]), "")
+	return strings.Split(list, "\n"), nil
 }
 
 // Swap is used to hot swap two sets on-the-fly. Use with names of existing sets of the same type.
