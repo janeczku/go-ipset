@@ -77,7 +77,7 @@ func initCheck() error {
 }
 
 func (s *IPSet) createHashSet(name string) error {
-/*	out, err := exec.Command("/usr/bin/sudo",
+	/*	out, err := exec.Command("/usr/bin/sudo",
 		ipsetPath, "create", name, s.HashType, "family", s.HashFamily, "hashsize", strconv.Itoa(s.HashSize),
 		"maxelem", strconv.Itoa(s.MaxElem), "timeout", strconv.Itoa(s.Timeout), "-exist").CombinedOutput()*/
 	out, err := exec.Command(ipsetPath, "create", name, s.HashType, "family", s.HashFamily, "hashsize", strconv.Itoa(s.HashSize),
@@ -174,6 +174,16 @@ func (s *IPSet) Add(entry string, timeout int) error {
 	out, err := exec.Command(ipsetPath, "add", s.Name, entry, "timeout", strconv.Itoa(timeout), "-exist").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error adding entry %s: %v (%s)", entry, err, out)
+	}
+	return nil
+}
+
+// AddOption is used to add the specified entry to the set.
+// A timeout of 0 means that the entry will be stored permanently in the set.
+func (s *IPSet) AddOption(entry string, option string, timeout int) error {
+	out, err := exec.Command(ipsetPath, "add", s.Name, entry, option, "timeout", strconv.Itoa(timeout), "-exist").CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error adding entry %s with option %s : %v (%s)", entry, option, err, out)
 	}
 	return nil
 }
