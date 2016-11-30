@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// ipset is a library providing a wrapper to the IPtables ipset userspace utility
+// Package ipset is a library providing a wrapper to the IPtables ipset userspace utility
 package ipset
 
 import (
@@ -69,9 +69,8 @@ func initCheck() error {
 		}
 		if supportedVersion {
 			return nil
-		} else {
-			return errIpsetNotSupported
 		}
+		return errIpsetNotSupported
 	}
 	return nil
 }
@@ -215,6 +214,15 @@ func (s *IPSet) Destroy() error {
 	return nil
 }
 
+// DestroyAll is used to destroy the set.
+func (s *IPSet) DestroyAll() error {
+	out, err := exec.Command(ipsetPath, "destroy").CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error destroying set %s (%s)", err, out)
+	}
+	return nil
+}
+
 // Swap is used to hot swap two sets on-the-fly. Use with names of existing sets of the same type.
 func Swap(from, to string) error {
 	out, err := exec.Command(ipsetPath, "swap", from, to).Output()
@@ -228,6 +236,14 @@ func destroyIPSet(name string) error {
 	out, err := exec.Command(ipsetPath, "destroy", name).Output()
 	if err != nil {
 		return fmt.Errorf("error destroying ipset %s: %v (%s)", name, err, out)
+	}
+	return nil
+}
+
+func destroyAll() error {
+	out, err := exec.Command(ipsetPath, "destroy").Output()
+	if err != nil {
+		return fmt.Errorf("error destroying all ipsetz %s (%s)", err, out)
 	}
 	return nil
 }
