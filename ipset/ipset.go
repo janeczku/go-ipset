@@ -215,7 +215,8 @@ func (s *IPSet) Destroy() error {
 }
 
 // DestroyAll is used to destroy the set.
-func (s *IPSet) DestroyAll() error {
+func DestroyAll() error {
+	initCheck()
 	out, err := exec.Command(ipsetPath, "destroy").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error destroying set %s (%s)", err, out)
