@@ -205,6 +205,17 @@ func (s *IPSet) Flush() error {
 	return nil
 }
 
+// List is used to show the contents of a set
+func (s *IPSet) List() ([]string, error) {
+	out, err := exec.Command(ipsetPath, "list", s.Name).CombinedOutput()
+	if err != nil {
+		return []string{}, fmt.Errorf("error listing set %s: %v (%s)", s.Name, err, out)
+	}
+	r := regexp.MustCompile("(?m)^(.*\n)*Members:\n")
+	list := r.ReplaceAllString(string(out[:]), "")
+	return strings.Split(list, "\n"), nil
+}
+
 // Destroy is used to destroy the set.
 func (s *IPSet) Destroy() error {
 	out, err := exec.Command(ipsetPath, "destroy", s.Name).CombinedOutput()
