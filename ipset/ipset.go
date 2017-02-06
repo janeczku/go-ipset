@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// ipset is a library providing a wrapper to the IPtables ipset userspace utility
+// Package ipset is a library providing a wrapper to the IPtables ipset userspace utility
 package ipset
 
 import (
@@ -69,9 +69,8 @@ func initCheck() error {
 		}
 		if supportedVersion {
 			return nil
-		} else {
-			return errIpsetNotSupported
 		}
+		return errIpsetNotSupported
 	}
 	return nil
 }
@@ -178,6 +177,16 @@ func (s *IPSet) Add(entry string, timeout int) error {
 	return nil
 }
 
+// AddOption is used to add the specified entry to the set.
+// A timeout of 0 means that the entry will be stored permanently in the set.
+func (s *IPSet) AddOption(entry string, option string, timeout int) error {
+	out, err := exec.Command(ipsetPath, "add", s.Name, entry, option, "timeout", strconv.Itoa(timeout), "-exist").CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error adding entry %s with option %s : %v (%s)", entry, option, err, out)
+	}
+	return nil
+}
+
 // Del is used to delete the specified entry from the set.
 func (s *IPSet) Del(entry string) error {
 	out, err := exec.Command(ipsetPath, "del", s.Name, entry, "-exist").CombinedOutput()
@@ -196,15 +205,6 @@ func (s *IPSet) Flush() error {
 	return nil
 }
 
-// Destroy is used to destroy the set.
-func (s *IPSet) Destroy() error {
-	out, err := exec.Command(ipsetPath, "destroy", s.Name).CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("error destroying set %s: %v (%s)", s.Name, err, out)
-	}
-	return nil
-}
-
 // List is used to show the contents of a set
 func (s *IPSet) List() ([]string, error) {
 	out, err := exec.Command(ipsetPath, "list", s.Name).CombinedOutput()
@@ -214,6 +214,25 @@ func (s *IPSet) List() ([]string, error) {
 	r := regexp.MustCompile("(?m)^(.*\n)*Members:\n")
 	list := r.ReplaceAllString(string(out[:]), "")
 	return strings.Split(list, "\n"), nil
+}
+
+// Destroy is used to destroy the set.
+func (s *IPSet) Destroy() error {
+	out, err := exec.Command(ipsetPath, "destroy", s.Name).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error destroying set %s: %v (%s)", s.Name, err, out)
+	}
+	return nil
+}
+
+// DestroyAll is used to destroy the set.
+func DestroyAll() error {
+	initCheck()
+	out, err := exec.Command(ipsetPath, "destroy").CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error destroying set %s (%s)", err, out)
+	}
+	return nil
 }
 
 // Swap is used to hot swap two sets on-the-fly. Use with names of existing sets of the same type.
@@ -229,6 +248,14 @@ func destroyIPSet(name string) error {
 	out, err := exec.Command(ipsetPath, "destroy", name).Output()
 	if err != nil {
 		return fmt.Errorf("error destroying ipset %s: %v (%s)", name, err, out)
+	}
+	return nil
+}
+
+func destroyAll() error {
+	out, err := exec.Command(ipsetPath, "destroy").Output()
+	if err != nil {
+		return fmt.Errorf("error destroying all ipsetz %s (%s)", err, out)
 	}
 	return nil
 }
