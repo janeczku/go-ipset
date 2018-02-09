@@ -25,8 +25,8 @@ import (
 	"strconv"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/coreos/go-semver/semver"
+	"github.com/sirupsen/logrus"
 )
 
 const minIpsetVersion = "6.0.0"
@@ -64,7 +64,7 @@ func initCheck() error {
 		ipsetPath = path
 		supportedVersion, err := getIpsetSupportedVersion()
 		if err != nil {
-			log.Warnf("Error checking ipset version, assuming version at least 6.0.0: %v", err)
+			logrus.Warnf("Error checking ipset version, assuming version at least 6.0.0: %v", err)
 			supportedVersion = true
 		}
 		if supportedVersion {
@@ -136,7 +136,7 @@ func (s *IPSet) Refresh(entries []string) error {
 	for _, entry := range entries {
 		out, err := exec.Command(ipsetPath, "add", tempName, entry, "-exist").CombinedOutput()
 		if err != nil {
-			log.Errorf("error adding entry %s to set %s: %v (%s)", entry, tempName, err, out)
+			logrus.Errorf("error adding entry %s to set %s: %v (%s)", entry, tempName, err, out)
 		}
 	}
 	err = Swap(tempName, s.Name)
