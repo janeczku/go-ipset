@@ -125,6 +125,26 @@ func New(name string, hashtype string, p *Params) (*IPSet, error) {
 	return &s, nil
 }
 
+// Names is used to show names of all lists
+func Names() ([]string, error) {
+	out, err := exec.Command(ipsetPath, "-n", "list").CombinedOutput()
+	if err != nil {
+		return []string{}, fmt.Errorf("error listing names: %v (%s)", err, out)
+	}
+	return strings.Split(string(out), "\n"), nil
+}
+
+// List is used to show the contents of a set
+func List(listName string) ([]string, error) {
+	out, err := exec.Command(ipsetPath, "list", listName).CombinedOutput()
+	if err != nil {
+		return []string{}, fmt.Errorf("error listing set %s: %v (%s)", listName, err, out)
+	}
+	r := regexp.MustCompile("(?m)^(.*\n)*Members:\n")
+	list := r.ReplaceAllString(string(out[:]), "")
+	return strings.Split(list, "\n"), nil
+}
+
 // Refresh is used to to overwrite the set with the specified entries.
 // The ipset is updated on the fly by hot swapping it with a temporary set.
 func (s *IPSet) Refresh(entries []string) error {
@@ -207,13 +227,7 @@ func (s *IPSet) Flush() error {
 
 // List is used to show the contents of a set
 func (s *IPSet) List() ([]string, error) {
-	out, err := exec.Command(ipsetPath, "list", s.Name).CombinedOutput()
-	if err != nil {
-		return []string{}, fmt.Errorf("error listing set %s: %v (%s)", s.Name, err, out)
-	}
-	r := regexp.MustCompile("(?m)^(.*\n)*Members:\n")
-	list := r.ReplaceAllString(string(out[:]), "")
-	return strings.Split(list, "\n"), nil
+	return List(s.Name)
 }
 
 // Destroy is used to destroy the set.
