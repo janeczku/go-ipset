@@ -198,12 +198,15 @@ func (s *IPSet) Test(entry string) (bool, error) {
 
 // Add is used to add the specified entry to the set.
 // A timeout of 0 means that the entry will be stored permanently in the set.
-func (s *IPSet) Add(entry string, timeout int) error {
-	out, err := exec.Command(ipsetPath, "add", s.Name, entry, "timeout", strconv.Itoa(timeout), "-exist").CombinedOutput()
+func Add(listName, entry string, timeout int) error {
+	out, err := exec.Command(ipsetPath, "add", listName, entry, "timeout", strconv.Itoa(timeout), "-exist").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error adding entry %s: %v (%s)", entry, err, out)
 	}
 	return nil
+}
+func (s *IPSet) Add(entry string, timeout int) error {
+	return Add(s.Name, entry, timeout)
 }
 
 // AddOption is used to add the specified entry to the set.
@@ -217,12 +220,15 @@ func (s *IPSet) AddOption(entry string, option string, timeout int) error {
 }
 
 // Del is used to delete the specified entry from the set.
-func (s *IPSet) Del(entry string) error {
-	out, err := exec.Command(ipsetPath, "del", s.Name, entry, "-exist").CombinedOutput()
+func Del(listName, entry string) error {
+	out, err := exec.Command(ipsetPath, "del", listName, entry, "-exist").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error deleting entry %s: %v (%s)", entry, err, out)
 	}
 	return nil
+}
+func (s *IPSet) Del(entry string) error {
+	return Del(s.Name, entry)
 }
 
 // Flush is used to flush all entries in the set.
