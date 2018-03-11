@@ -145,6 +145,15 @@ func List(listName string) ([]string, error) {
 	return strings.Split(list, "\n"), nil
 }
 
+// Destroy is used to destroy the set.
+func Destroy(listName) error {
+	out, err := exec.Command(ipsetPath, "destroy", listName).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("error destroying set %s: %v (%s)", listName, err, out)
+	}
+	return nil
+}
+
 // Refresh is used to to overwrite the set with the specified entries.
 // The ipset is updated on the fly by hot swapping it with a temporary set.
 func (s *IPSet) Refresh(entries []string) error {
@@ -232,11 +241,7 @@ func (s *IPSet) List() ([]string, error) {
 
 // Destroy is used to destroy the set.
 func (s *IPSet) Destroy() error {
-	out, err := exec.Command(ipsetPath, "destroy", s.Name).CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("error destroying set %s: %v (%s)", s.Name, err, out)
-	}
-	return nil
+	return Destroy(s.Name)
 }
 
 // DestroyAll is used to destroy the set.
