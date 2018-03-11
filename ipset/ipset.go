@@ -146,7 +146,7 @@ func List(listName string) ([]string, error) {
 }
 
 // Destroy is used to destroy the set.
-func Destroy(listName) error {
+func Destroy(listName string) error {
 	out, err := exec.Command(ipsetPath, "destroy", listName).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("error destroying set %s: %v (%s)", listName, err, out)
