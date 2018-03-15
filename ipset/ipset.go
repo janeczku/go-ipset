@@ -173,8 +173,8 @@ func (s *IPSet) Refresh(entries []string) error {
 }
 
 // Test is used to check whether the specified entry is in the set or not.
-func (s *IPSet) Test(entry string) (bool, error) {
-	out, err := exec.Command(ipsetPath, "test", s.Name, entry).CombinedOutput()
+func Test(listName, entry string) (bool, error) {
+	out, err := exec.Command(ipsetPath, "test", listName, entry).CombinedOutput()
 	if err == nil {
 		reg, e := regexp.Compile("NOT")
 		if e == nil && reg.MatchString(string(out)) {
@@ -187,6 +187,9 @@ func (s *IPSet) Test(entry string) (bool, error) {
 	} else {
 		return false, fmt.Errorf("error testing entry %s: %v (%s)", entry, err, out)
 	}
+}
+func (s *IPSet) Test(entry string) (bool, error) {
+	return Test(s.Name, entry)
 }
 
 // Add is used to add the specified entry to the set.
