@@ -26,7 +26,7 @@ Install dependencies:
 ## Usage ##
 
 ```go
-import "github.com/janeczku/go-ipset/ipset
+import "github.com/janeczku/go-ipset/ipset"
 ```
 
 #### Create a new set
