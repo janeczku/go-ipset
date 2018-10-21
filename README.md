@@ -16,7 +16,7 @@ Install go-ipset using the "go get" command:
 
 Install dependencies:
 
-    go get github.com/Sirupsen/logrus
+    go get github.com/sirupsen/logrus
     go get github.com/coreos/go-semver/semver
 
 ## API Reference ##
