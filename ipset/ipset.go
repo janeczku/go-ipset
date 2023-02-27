@@ -93,7 +93,8 @@ func (s *IPSet) createHashSet(name string) error {
 
 // New creates a new set and returns an Interface to it.
 // Example:
-// 	testIpset := ipset.New("test", "hash:ip", &ipset.Params{})
+//
+//	testIpset := ipset.New("test", "hash:ip", &ipset.Params{})
 func New(name string, hashtype string, p *Params) (*IPSet, error) {
 	// Using the ipset utilities default values here
 	if p.HashSize == 0 {
@@ -212,7 +213,10 @@ func (s *IPSet) List() ([]string, error) {
 		return []string{}, fmt.Errorf("error listing set %s: %v (%s)", s.Name, err, out)
 	}
 	r := regexp.MustCompile("(?m)^(.*\n)*Members:\n")
-	list := r.ReplaceAllString(string(out[:]), "")
+	list := strings.TrimSuffix(r.ReplaceAllString(string(out[:]), "\n"), "")
+	if list == "" {
+		return []string{}, nil
+	}
 	return strings.Split(list, "\n"), nil
 }
 
