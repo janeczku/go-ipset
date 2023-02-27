@@ -213,7 +213,7 @@ func (s *IPSet) List() ([]string, error) {
 		return []string{}, fmt.Errorf("error listing set %s: %v (%s)", s.Name, err, out)
 	}
 	r := regexp.MustCompile("(?m)^(.*\n)*Members:\n")
-	list := strings.TrimSuffix(r.ReplaceAllString(string(out[:]), "\n"), "")
+	list := strings.TrimSuffix(r.ReplaceAllString(string(out[:]), ""), "\n")
 	if list == "" {
 		return []string{}, nil
 	}
